@@ -1,34 +1,46 @@
 import { NextResponse } from "next/server"
 
 export async function GET(req: Request) {
-  let isAborted: boolean = false
+  console.log('Received GET request to /api/users')
+  const abortController = new AbortController()
+  
   req.signal.onabort = () => {
-    console.log('Request aborted')
-    isAborted = true
+    console.log('Request aborted by client (req.signal.onabort)')
+    abortController.abort()
   }
 
   try {
-    // Your main logic here
-    const result = await someAsyncOperation()
-
-    if (isAborted) {
-      console.log('Not sending response because request was aborted')
-      return new NextResponse(null, { status: 499 }) // Client Closed Request
+    const result = await someAsyncOperation(abortController.signal)
+    
+    if (req.signal.aborted) {
+      return new NextResponse(null, { status: 499 })
     }
 
     return NextResponse.json({ result })
-  } catch (error) {    
-    // Handle other errors
-    return NextResponse.json({ error: (error as { message: string }).message }, { status: 500 })
+    
+  } catch (error) {
+    if ((error as Error).name === 'AbortError') {
+      return new NextResponse(null, { status: 499 })
+    }
+    
+    console.error('Error in request:', error)
+    return NextResponse.json(
+      { error: (error as Error).message }, 
+      { status: 500 }
+    )
   }
 }
 
-async function someAsyncOperation() {
-  // Simulate a long-running operation that can be aborted
-  return new Promise((resolve) => {
-    setTimeout(() => {
+async function someAsyncOperation(signal: AbortSignal) {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
       resolve('Operation Result')
-    }, 10000)
+    }, 5000)
+    
+    // Cancela a operação se o signal for abortado
+    signal.addEventListener('abort', () => {
+      clearTimeout(timeoutId)
+      reject(new Error('AbortError'))
+    })
   })
-  
 }
