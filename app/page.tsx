@@ -16,7 +16,7 @@ export default function Home() {
     fetch('/api/users', { signal })
       .then(response => response.json())
       .then(data => {
-        setUsers(data.result)
+        setUsers(data.result.users)
       })
       .catch(err => {
         // O erro 'AbortError' é esperado quando cancelamos

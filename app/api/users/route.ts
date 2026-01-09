@@ -12,14 +12,12 @@ export async function GET(req: Request) {
   }
 
   try {
-    const result = await fetch('https://jsonplaceholder.typicode.com/users', {
+    const result = await fetch('http://localhost:3000/api/list-users', {
       signal: abortController.signal
     }).then(res => res.json())
-    
-    
-    // Delay de 5 segundos
-    await new Promise(resolve => setTimeout(resolve, 5000))
-    
+
+    console.log('Generated users successfully:', result.users)
+
     if (req.signal.aborted) {
       return new NextResponse(null, { 
         status: 499,
