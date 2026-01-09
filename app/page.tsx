@@ -13,7 +13,10 @@ export default function Home() {
     console.log('Iniciando fetch para /api/users...')
 
     // Faz a requisição passando o signal do controller
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, { signal })
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, { 
+      signal,
+      cache: 'no-store'
+     })
       .then(response => response.json())
       .then(data => {
         setUsers(data.result.users)

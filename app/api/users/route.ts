@@ -13,7 +13,8 @@ export async function GET(req: Request) {
 
   try {
     const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/list-users`, {
-      signal: abortController.signal
+      signal: abortController.signal,
+      cache: 'no-store'
     }).then(res => res.json())
 
     console.log('Generated users successfully:', result.users)
