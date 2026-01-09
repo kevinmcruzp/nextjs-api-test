@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const result = await fetch('http://localhost:3000/api/list-users', {
+    const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/list-users`, {
       signal: abortController.signal
     }).then(res => res.json())
 
