@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
+  const [users, setUsers] = useState<{id: number, name: string}[]>([]);
+
   useEffect(() => {
     // Cria um AbortController para controlar a requisição
     const controller = new AbortController()
@@ -14,7 +16,7 @@ export default function Home() {
     fetch('/api/users', { signal })
       .then(response => response.json())
       .then(data => {
-        console.log('Fetch completado com sucesso:', data)
+        setUsers(data.result)
       })
       .catch(err => {
         // O erro 'AbortError' é esperado quando cancelamos
@@ -43,6 +45,14 @@ export default function Home() {
       <h1>Testando Abort de Requisição</h1>
       <p>Abra o console do navegador e o terminal do servidor para ver os logs.</p>
       <p>A requisição será cancelada após 1 segundo.</p>
+
+      {users && (
+        <ul>
+          {users.map(user => (
+            <li key={user.id}>{user.name}</li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
